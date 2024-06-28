@@ -1,5 +1,5 @@
 # (kafka 3.0 之後不再依賴zookeeper 改使用 kRaft)
-# 啟動kafka
+## 啟動kafka
 sh kafka-server-start.sh /path/to/config/kraft/server.properties
 
 # 停止kafka
