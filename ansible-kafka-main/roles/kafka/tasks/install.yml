@@ -1,10 +1,12 @@
 ---
+# 下載 JDK 11
 - name: Install JDK
   become: true
   ansible.builtin.apt:
     name: openjdk-11-jdk
     state: present
 
+# 新增使用者
 - name: Add user kafka
   become: true
   shell: |
@@ -12,6 +14,7 @@
     useradd -s /sbin/nologin --system -g kafka kafka
   ignore_errors: yes
 
+# 建立資料夾
 - name: Create kafka data dir
   become: true
   file:
@@ -20,11 +23,13 @@
     mode: '1775'
     owner: kafka
     group: kafka
+    # true 表示遞歸地創建指定的目錄（或文件）及其所有子目錄（或子文件）。
     recurse: true
   with_items:
     - "{{kafka_home}}_{{kafka_port}}"
     - "{{kafka_home}}_{{kafka_port}}/log"
 
+# 下載 kafka
 - name: Downloading kafka
   become: true
   get_url:
@@ -32,12 +37,14 @@
     dest: "{{kafka_home}}_{{kafka_port}}/kafka.tgz"
     mode: '0755'
 
+# 解壓縮 
 - name: Unzip kafka
   become: true
   shell: tar -xvzf kafka.tgz --strip 1
   args:
     chdir: "{{kafka_home}}_{{kafka_port}}"
 
+# 配置及設定 serverId
 - name: Config kafka for cluster & Setup server id
   become: true
   template: 
@@ -46,21 +53,27 @@
     owner: kafka
     group: kafka
 
+# 產生 cluster id
 - name: create cluster id
   become: true
+# run once to avoid race in multiple hosts
   run_once: true
   shell: "{{kafka_home}}_{{kafka_port}}/bin/kafka-storage.sh random-uuid"
   register: cluster_id
 
+# 取得 cluster id
 - name: create get cluster id
   run_once: true
+# 動態地設置變數的值 
   set_fact:
     kafka_cluster_id: "{{ cluster_id.stdout }}"
 
+# 創建 storage 並格式化
 - name: Create storage
   become: true
   shell: "{{kafka_home}}_{{kafka_port}}/bin/kafka-storage.sh format -t {{kafka_cluster_id}} -c {{kafka_home}}_{{kafka_port}}/config/kraft/server.properties"
-    
+
+# 配置 systemd
 - name: Copy kafka's daemon config
   become: true
   template:
@@ -71,6 +84,7 @@
     group: kafka
     backup: yes
 
+# 啟動服務
 - name: Start kafka service
   become: true
   systemd:
