@@ -1,4 +1,5 @@
 - hosts: kafka_all
+# 遇到錯誤就會停止
   any_errors_fatal: '{{ any_errors_fatal | default(true) }}'  
   vars:
     purpose: 'install'
