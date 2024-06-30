@@ -4,9 +4,8 @@ After=network.target
 
 [Service]
 Type=simple
-User=kafka
 ExecStart=/bin/sh -c '{{kafka_home}}_{{kafka_port}}/bin/kafka-server-start.sh {{kafka_home}}_{{kafka_port}}/config/kraft/server.properties > {{kafka_home}}_{{kafka_port}}/log/kafka.log 2>&1'
-ExecStop={{kafka_home}}_{{kafka_port}}/bin/kafka-server-stop.sh
+// ExecStop={{kafka_home}}_{{kafka_port}}/bin/kafka-server-stop.sh
 Restart=on-abnormal
 
 [Install]
