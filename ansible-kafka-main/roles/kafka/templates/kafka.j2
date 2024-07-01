@@ -3,8 +3,11 @@ broker.id={{ host_index | int +1}}
 port={{kafka_port}}
 
 controller.quorum.voters={{voters}}
+# 指定 kafka 監聽端口 
 listeners=PLAINTEXT://:{{kafka_port}},CONTROLLER://:{{kafka_port|int+1}}
+# broker 對外公佈的地址和端口
 advertised.listeners=PLAINTEXT://{{ip}}:{{kafka_port}}
+# controller 使用的監聽器名稱
 controller.listener.names=CONTROLLER
 listener.security.protocol.map=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
 
